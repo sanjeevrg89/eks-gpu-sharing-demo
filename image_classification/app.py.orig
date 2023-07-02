@@ -1,0 +1,56 @@
+import torch
+from torchvision.models import vgg19
+from torchvision.transforms import ToPILImage
+from flask import Flask, request, send_file, jsonify
+from werkzeug.exceptions import BadRequest
+from io import BytesIO
+import logging
+
+# Set up logging
+logging.basicConfig(level=logging.INFO)
+
+# Load the model
+model = vgg19(pretrained=True)
+model.eval()
+
+# Create a Flask app
+app = Flask(__name__)
+
+@app.route('/generate', methods=['POST'])
+def generate():
+    try:
+        # Get the input data from the request
+        input_data = request.json
+
+        # Check that the input data is valid
+        if not isinstance(input_data, list):
+            raise BadRequest('Input data must be a list of numbers.')
+
+        # Convert the input data to a tensor
+        input_tensor = torch.tensor(input_data)
+
+        # Use the model to generate an image
+        image_tensor = model(input_tensor)
+
+        # Convert the tensor to a PIL image
+        to_pil = ToPILImage()
+        image = to_pil(image_tensor)
+
+        # Save the image to a BytesIO object
+        byte_io = BytesIO()
+        image.save(byte_io, 'JPEG')
+
+        # Send the image data in the response
+        byte_io.seek(0)
+        return send_file(byte_io, mimetype='image/jpeg')
+
+    except BadRequest as e:
+        logging.error(e)
+        return jsonify({'error': str(e)}), 400
+
+    except Exception as e:
+        logging.error(e)
+        return jsonify({'error': 'An unexpected error occurred.'}), 500
+
+if __name__ == '__main__':
+    app.run(host='0.0.0.0', port=80)
