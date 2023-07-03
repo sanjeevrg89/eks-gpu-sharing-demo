@@ -44,7 +44,6 @@ module "eks_blueprints_kubernetes_addons" {
   cluster_version   = module.eks.cluster_version
   oidc_provider     = module.eks.cluster_oidc_issuer_url
   oidc_provider_arn = module.eks.oidc_provider_arn
-}
 
   #---------------------------------------
   # Amazon EKS Managed Add-ons
@@ -83,3 +82,4 @@ module "eks_blueprints_kubernetes_addons" {
     version = "1.4.7"
     timeout = "300"
   }
+}
