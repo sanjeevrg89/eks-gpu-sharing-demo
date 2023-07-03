@@ -29,15 +29,6 @@ module "eks" {
   create_node_security_group    = true
 
   node_security_group_additional_rules = {
-    # Control plane invoke Karpenter webhook
-    ingress_karpenter_webhook_tcp = {
-      description                   = "Control plane invoke Karpenter webhook"
-      protocol                      = "tcp"
-      from_port                     = 8443
-      to_port                       = 8443
-      type                          = "ingress"
-      source_cluster_security_group = true
-    },
     ingress_allow_access_from_control_plane = {
       type                          = "ingress"
       protocol                      = "tcp"
@@ -56,14 +47,10 @@ module "eks" {
       ipv6_cidr_blocks = ["::/0"]
     }
   }
-
-  # Only need one node to get Karpenter up and running.
-  # This ensures core services such as VPC CNI, CoreDNS, etc. are up and running
-  # so that Karpetner can be deployed and start managing compute capacity as required
   eks_managed_node_groups = {
     ng1 = {
       instance_types = ["t3.medium"]
-      create_security_group                 = false
+      create_security_group                 = true
       attach_cluster_primary_security_group = true
 
       min_size     = 1
@@ -77,7 +64,7 @@ module "eks" {
 
     gpu = {
       instance_types = ["g5.xlarge"]
-      create_security_group                 = false
+      create_security_group                 = true
       attach_cluster_primary_security_group = true
 
       min_size     = 1

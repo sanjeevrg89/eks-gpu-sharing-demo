@@ -82,35 +82,3 @@ module "eks_blueprints_kubernetes_addons" {
     version = "1.4.7"
     timeout = "300"
   }
-
-  #---------------------------------------
-  # Amazon Managed Prometheus
-  #---------------------------------------
-  enable_amazon_prometheus             = true
-  amazon_prometheus_workspace_endpoint = aws_prometheus_workspace.amp.prometheus_endpoint
-
-  #---------------------------------------
-  # Prometheus Server Add-on
-  #---------------------------------------
-  enable_prometheus = true
-  prometheus_helm_config = {
-    name       = "prometheus"
-    repository = "https://prometheus-community.github.io/helm-charts"
-    chart      = "prometheus"
-    version    = "15.10.1"
-    namespace  = "prometheus"
-    timeout    = "300"
-    values     = [templatefile("${path.module}/helm-values/prometheus-values.yaml", {})]
-  }
-
-
-  tags = local.tags
-}
-
-#---------------------------------------------------------------
-# Amazon Prometheus Workspace
-#---------------------------------------------------------------
-resource "aws_prometheus_workspace" "amp" {
-  alias = format("%s-%s", "amp-ws", local.cluster_name)
-  tags  = local.tags
-}
