@@ -63,23 +63,4 @@ module "eks_blueprints_kubernetes_addons" {
       preserve = true
     }
   }
-
-  #---------------------------------------
-  # AWS for FluentBit - DaemonSet
-  #---------------------------------------
-  enable_aws_for_fluentbit            = true
-  aws_for_fluentbit_cw_log_group_name = "/${var.cluster_name}/fluentbit-logs" # Add-on creates this log group
-  aws_for_fluentbit_helm_config = {
-    version = "0.1.24"
-    values = [templatefile("${path.module}/helm-values/aws-for-fluentbit-values.yaml", {
-      region               = var.region,
-      cloudwatch_log_group = "/${var.cluster_name}/fluentbit-logs"
-    })]
-  }
-
-  enable_aws_load_balancer_controller = true
-  aws_load_balancer_controller_helm_config = {
-    version = "1.4.7"
-    timeout = "300"
-  }
 }
