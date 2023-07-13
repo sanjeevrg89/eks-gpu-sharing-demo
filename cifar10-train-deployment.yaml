@@ -1,0 +1,23 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: tensorflow-cifar10-deployment
+  namespace: gpu-demo
+  labels:
+    app: tensorflow-cifar10
+spec:
+  replicas: 5
+  selector:
+    matchLabels:
+      app: tensorflow-cifar10
+  template:
+    metadata:
+      labels:
+        app: tensorflow-cifar10
+    spec:
+      containers:
+      - name: tensorflow-cifar10
+        image: public.ecr.aws/r5m2h0c9/cifar10_cnn:v2
+        resources:
+          limits:
+            nvidia.com/gpu: 1
